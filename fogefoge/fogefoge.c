@@ -1,27 +1,69 @@
 #include <stdio.h>
 #include <locale.h>
 #include <stdlib.h>
+#include "fogefoge.h"
+#include "mapa.h"
 
-int main() {
+MAPA m;
+POSICAO heroi;
 
-  setlocale (LC_ALL, "portuguese");
+// Função para finalizar o jogo, 'provisoria'
+int acabou()
+{
+    return 0;
+}
 
-  char mapa [5] [10 + 1];
+// Função que move o @.
+void move(char direcao)
+{
 
-  FILE* f;
+    if (direcao != 'a' &&
+        direcao != 'w' &&
+        direcao != 's' &&
+        direcao != 'd')
+        return;
 
-  f = fopen("mapa.txt", "r");
-  if(f == 0) {
-    printf("ERRO na leitura do mapa.\n");
-    exit(1);
-  }
+    m.matriz[heroi.x][heroi.y] = '.';
 
-  for(int i = 0; i < 5; i++){
-    fscanf(f, "%s", mapa[i]);
-  }
+    switch (direcao)
+    {
+    case 'a':
+        m.matriz[heroi.x][heroi.y - 1] = '@';
+        heroi.y--;
+        break;
+    case 'w':
+        m.matriz[heroi.x - 1][heroi.y] = '@';
+        heroi.x--;
+        break;
+    case 's':
+        m.matriz[heroi.x + 1][heroi.y] = '@';
+        heroi.x++;
+        break;
+    case 'd':
+        m.matriz[heroi.x][heroi.y + 1] = '@';
+        heroi.y++;
+        break;
+    }
+}
 
-  for(int i = 0; i < 5 ; i++){
-    printf("%s\n", mapa[i]);
-  }
-  fclose(f);
+int main()
+{
+
+    setlocale(LC_ALL, "portuguese");
+
+    lemapa(&m);
+    encontra_mapa(&m, &heroi, '@');
+
+    do
+    {
+        imprimemapa(&m);
+
+        char comando;
+
+        scanf(" %c", &comando);
+        move(comando);
+
+    } while (!acabou());
+
+    liberamapa(&m);
 }
