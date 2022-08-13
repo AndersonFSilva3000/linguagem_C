@@ -1,9 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "mapa.h"
+#include <string.h>
+
+int ehvalida(MAPA *m, int x, int y)
+{
+  if (x >= m->linhas)
+  {
+    return 0;
+  }
+  if (y >= m->colunas)
+  {
+    return 0;
+  }
+  return 1;
+}
+
+void andanomapa(MAPA* m, int xorigem, int yorigem,
+                int xdestino, int ydestino)
+{
+  char personagem = m->matriz[xorigem][yorigem];
+  m->matriz[xdestino][ydestino] = personagem;
+  m->matriz[xorigem][yorigem] = VAZIO;
+}
 
 // Função que encontra a posição do @
-void encontra_mapa(MAPA *m, POSICAO *p, char c)
+int encontra_mapa(MAPA *m, POSICAO *p, char c)
 {
 
   for (int i = 0; i < m->linhas; i++)
@@ -14,10 +36,11 @@ void encontra_mapa(MAPA *m, POSICAO *p, char c)
       {
         p->x = i;
         p->y = j;
-        break;
+        return 1;
       }
     }
   }
+  return 0;
 }
 
 // Função para ler o mapa
@@ -65,11 +88,30 @@ void liberamapa(MAPA *m)
   free(m->matriz);
 }
 
-// Função que imprime o mapa na tela.
-void imprimemapa(MAPA *m)
-{
-  for (int i = 0; i < m->linhas; i++)
-  {
-    printf("%s\n", m->matriz[i]);
-  }
+void copia_mapa(MAPA* destino, MAPA* origem){
+    destino->linhas = origem->linhas;
+    destino->colunas = origem->colunas;
+    alocamapa(destino);
+    for(int i = 0; i < origem->linhas; i++ ){
+        strcpy(destino->matriz[i], origem->matriz[i]);
+    }
 }
+
+int podeandar(MAPA* m, char persongem, int x, int y){
+    return
+        ehvalida(m, x, y ) &&
+        !ehparede(m, x, y) &&
+        !ehpersonagem(m, persongem, x, y);
+}
+
+int ehparede(MAPA* m, int x, int y){
+    return
+        m->matriz[x][y] == PAREDE_VERTICAL ||
+        m->matriz[x][y] == PAREDE_HORIZONTAL;
+}
+
+int ehpersonagem(MAPA* m, char personagem, int x , int y){
+    return
+        m->matriz[x][y] == personagem;
+}
+
